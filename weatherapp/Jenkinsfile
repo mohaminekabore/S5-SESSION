@@ -1,106 +1,101 @@
 pipeline {
     agent {
-        label ("dev")
-            }
+        label("dev")
+    }
     options {
         buildDiscarder(logRotator(numToKeepStr: '5'))
         disableConcurrentBuilds()
-        timeout (time: 60, unit: 'MINUTES')
+        timeout(time: 60, unit: 'MINUTES')
         timestamps()
-      }
+    }
     stages {
         stage("confirm branch") {
             steps {
                 sh '''
                 git branch --show-current
-                 echo $GIT_BRANCH
+                echo $GIT_BRANCH
                 '''
             }
         }
 
-        // stage('Test auth') {
-	    //  agent {
-        //     docker {
-        //       image 'golang:alpine'
-        //       args '-u root:root'
-        //     }
-        //    }
-        //     steps {
-        //         sh '''
-        //     id
-        //     cd weatherapp/auth/src/main
-        //     go build 
-        //     cd -
-        //     ls -la
-        //         '''
-        //     }
-        // }
-
-
-        // stage('Test UI') {
-	    //  agent {
-        //     docker {
-        //       image 'node:17'
-        //       args '-u root:root'
-        //     }
-        //    }
-        //     steps {
-        //         sh '''
-        //     cd weatherapp/UI
-        //     npm run
-        //         '''
-        //     }
-        // }
-
-        // stage('Test weather') {
-	    //  agent {
-        //     docker {
-        //       image 'python:3.8-slim-buster'
-        //       args '-u root:root'
-        //     }
-        //    }
-        //     steps {
-        //         sh '''
-        //     cd weatherapp/weather
-        //     pip3 install -r requirements.txt
-        //         '''
-        //     }
-        // }
-
-
-         stage('SonarQube analysis') {
+        stage('Test auth') {
             agent {
                 docker {
-                  image 'sonarsource/sonar-scanner-cli:4.7.0'
+                    image 'golang:alpine'
+                    args '-u root:root'
                 }
-               }
-               environment {
-        CI = 'true'
-        //  scannerHome = tool 'Sonar'
-        scannerHome='/opt/sonar-scanner'
-    }
-            steps{
+            }
+            steps {
+                sh '''
+                    id
+                    cd weatherapp/auth/src/main
+                    go build 
+                    cd -
+                    ls -la
+                '''
+            }
+        }
+
+        stage('Test UI') {
+            agent {
+                docker {
+                    image 'node:17'
+                    args '-u root:root'
+                }
+            }
+            steps {
+                sh '''
+                    cd weatherapp/UI
+                    npm run
+                '''
+            }
+        }
+
+        stage('Test weather') {
+            agent {
+                docker {
+                    image 'python:3.8-slim-buster'
+                    args '-u root:root'
+                }
+            }
+            steps {
+                sh '''
+                    cd weatherapp/weather
+                    pip3 install -r requirements.txt
+                '''
+            }
+        }
+
+        stage('SonarQube analysis') {
+            agent {
+                docker {
+                    image 'sonarsource/sonar-scanner-cli:4.7.0'
+                }
+            }
+            environment {
+                CI = 'true'
+                scannerHome = '/opt/sonar-scanner'
+            }
+            steps {
                 withSonarQubeEnv('Sonar') {
                     sh "${scannerHome}/bin/sonar-scanner"
                 }
             }
         }
 
-
-
         stage("Quality Gate") {
             steps {
                 timeout(time: 1, unit: 'HOURS') {
-                waitForQualityGate abortPipeline: true }
+                    waitForQualityGate abortPipeline: true
+                }
             }
         }
-
 
         stage('Build auth') {
             steps {
                 sh '''
-            cd $WORKSPACE/weatherapp/auth
-            docker build -t devopseasylearning/weatherapp-auth:${BUILD_NUMBER} .
+                    cd $WORKSPACE/weatherapp/auth
+                    docker build -t devopseasylearning/weatherapp-auth:${BUILD_NUMBER} .
                 '''
             }
         }
@@ -110,35 +105,35 @@ pipeline {
             }
             steps {
                 sh '''
-             docker push devopseasylearning/weatherapp-auth:${BUILD_NUMBER}
+                    docker push devopseasylearning/weatherapp-auth:${BUILD_NUMBER}
                 '''
             }
         }
-
 
         stage('Build UI') {
             steps {
                 sh '''
-            cd $WORKSPACE/weatherapp/UI
-            docker build -t devopseasylearning/weatherapp-ui:${BUILD_NUMBER} .
+                    cd $WORKSPACE/weatherapp/UI
+                    docker build -t devopseasylearning/weatherapp-ui:${BUILD_NUMBER} .
                 '''
             }
         }
-        stage('Push UI ') {
+        stage('Push UI') {
             when {
                 branch 'HEAD'
             }
             steps {
                 sh '''
-             docker push devopseasylearning/weatherapp-ui:${BUILD_NUMBER}
+                    docker push devopseasylearning/weatherapp-ui:${BUILD_NUMBER}
                 '''
             }
         }
+
         stage('Build Weather') {
             steps {
                 sh '''
-            cd $WORKSPACE/weatherapp/weather
-            docker build -t devopseasylearning/weatherapp-weather:${BUILD_NUMBER} .
+                    cd $WORKSPACE/weatherapp/weather
+                    docker build -t devopseasylearning/weatherapp-weather:${BUILD_NUMBER} .
                 '''
             }
         }
@@ -148,15 +143,16 @@ pipeline {
             }
             steps {
                 sh '''
-             docker push devopseasylearning/weatherapp-weather:${BUILD_NUMBER}
+                    docker push devopseasylearning/weatherapp-weather:${BUILD_NUMBER}
                 '''
             }
         }
+
         stage('Build Redis') {
             steps {
                 sh '''
-            cd $WORKSPACE/weatherapp/redis
-            docker build -t devopseasylearning/weatherapp-redis:${BUILD_NUMBER} .
+                    cd $WORKSPACE/weatherapp/redis
+                    docker build -t devopseasylearning/weatherapp-redis:${BUILD_NUMBER} .
                 '''
             }
         }
@@ -167,15 +163,16 @@ pipeline {
             }
             steps {
                 sh '''
-             docker push devopseasylearning/weatherapp-redis:${BUILD_NUMBER}
+                    docker push devopseasylearning/weatherapp-redis:${BUILD_NUMBER}
                 '''
             }
         }
+
         stage('Build db') {
             steps {
                 sh '''
-            cd $WORKSPACE/weatherapp/db
-            docker build -t devopseasylearning/weatherapp-db:${BUILD_NUMBER} .
+                    cd $WORKSPACE/weatherapp/db
+                    docker build -t devopseasylearning/weatherapp-db:${BUILD_NUMBER} .
                 '''
             }
         }
@@ -186,16 +183,9 @@ pipeline {
             }
             steps {
                 sh '''
-             docker push devopseasylearning/weatherapp-db:${BUILD_NUMBER}
+                    docker push devopseasylearning/weatherapp-db:${BUILD_NUMBER}
                 '''
             }
         }
-
     }
-
-
-
-
-
-
 }
