@@ -36,156 +36,156 @@ pipeline {
             }
         }
 
-        stage('Test UI') {
-            agent {
-                docker {
-                    image 'node:17'
-                    args '-u root:root'
-                }
-            }
-            steps {
-                sh '''
-                    cd weatherapp/UI
-                    npm run
-                '''
-            }
-        }
+    //     stage('Test UI') {
+    //         agent {
+    //             docker {
+    //                 image 'node:17'
+    //                 args '-u root:root'
+    //             }
+    //         }
+    //         steps {
+    //             sh '''
+    //                 cd weatherapp/UI
+    //                 npm run
+    //             '''
+    //         }
+    //     }
 
-        stage('Test weather') {
-            agent {
-                docker {
-                    image 'python:3.8-slim-buster'
-                    args '-u root:root'
-                }
-            }
-            steps {
-                sh '''
-                    cd weatherapp/weather
-                    pip3 install -r requirements.txt
-                '''
-            }
-        }
+    //     stage('Test weather') {
+    //         agent {
+    //             docker {
+    //                 image 'python:3.8-slim-buster'
+    //                 args '-u root:root'
+    //             }
+    //         }
+    //         steps {
+    //             sh '''
+    //                 cd weatherapp/weather
+    //                 pip3 install -r requirements.txt
+    //             '''
+    //         }
+    //     }
 
-        stage('SonarQube analysis') {
-            agent {
-                docker {
-                    image 'sonarsource/sonar-scanner-cli:4.7.0'
-                }
-            }
-            environment {
-                CI = 'true'
-                scannerHome = '/opt/sonar-scanner'
-            }
-            steps {
-                withSonarQubeEnv('Sonar') {
-                    sh "${scannerHome}/bin/sonar-scanner"
-                }
-            }
-        }
+    //     stage('SonarQube analysis') {
+    //         agent {
+    //             docker {
+    //                 image 'sonarsource/sonar-scanner-cli:4.7.0'
+    //             }
+    //         }
+    //         environment {
+    //             CI = 'true'
+    //             scannerHome = '/opt/sonar-scanner'
+    //         }
+    //         steps {
+    //             withSonarQubeEnv('Sonar') {
+    //                 sh "${scannerHome}/bin/sonar-scanner"
+    //             }
+    //         }
+    //     }
 
-        stage("Quality Gate") {
-            steps {
-                timeout(time: 1, unit: 'HOURS') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
+    //     stage("Quality Gate") {
+    //         steps {
+    //             timeout(time: 1, unit: 'HOURS') {
+    //                 waitForQualityGate abortPipeline: true
+    //             }
+    //         }
+    //     }
 
-        stage('Build auth') {
-            steps {
-                sh '''
-                    cd $WORKSPACE/weatherapp/auth
-                    docker build -t devopseasylearning/weatherapp-auth:${BUILD_NUMBER} .
-                '''
-            }
-        }
-        stage('Push auth') {
-            when {
-                branch 'HEAD'
-            }
-            steps {
-                sh '''
-                    docker push devopseasylearning/weatherapp-auth:${BUILD_NUMBER}
-                '''
-            }
-        }
+    //     stage('Build auth') {
+    //         steps {
+    //             sh '''
+    //                 cd $WORKSPACE/weatherapp/auth
+    //                 docker build -t devopseasylearning/weatherapp-auth:${BUILD_NUMBER} .
+    //             '''
+    //         }
+    //     }
+    //     stage('Push auth') {
+    //         when {
+    //             branch 'HEAD'
+    //         }
+    //         steps {
+    //             sh '''
+    //                 docker push devopseasylearning/weatherapp-auth:${BUILD_NUMBER}
+    //             '''
+    //         }
+    //     }
 
-        stage('Build UI') {
-            steps {
-                sh '''
-                    cd $WORKSPACE/weatherapp/UI
-                    docker build -t devopseasylearning/weatherapp-ui:${BUILD_NUMBER} .
-                '''
-            }
-        }
-        stage('Push UI') {
-            when {
-                branch 'HEAD'
-            }
-            steps {
-                sh '''
-                    docker push devopseasylearning/weatherapp-ui:${BUILD_NUMBER}
-                '''
-            }
-        }
+    //     stage('Build UI') {
+    //         steps {
+    //             sh '''
+    //                 cd $WORKSPACE/weatherapp/UI
+    //                 docker build -t devopseasylearning/weatherapp-ui:${BUILD_NUMBER} .
+    //             '''
+    //         }
+    //     }
+    //     stage('Push UI') {
+    //         when {
+    //             branch 'HEAD'
+    //         }
+    //         steps {
+    //             sh '''
+    //                 docker push devopseasylearning/weatherapp-ui:${BUILD_NUMBER}
+    //             '''
+    //         }
+    //     }
 
-        stage('Build Weather') {
-            steps {
-                sh '''
-                    cd $WORKSPACE/weatherapp/weather
-                    docker build -t devopseasylearning/weatherapp-weather:${BUILD_NUMBER} .
-                '''
-            }
-        }
-        stage('Push weather') {
-            when {
-                branch 'HEAD'
-            }
-            steps {
-                sh '''
-                    docker push devopseasylearning/weatherapp-weather:${BUILD_NUMBER}
-                '''
-            }
-        }
+    //     stage('Build Weather') {
+    //         steps {
+    //             sh '''
+    //                 cd $WORKSPACE/weatherapp/weather
+    //                 docker build -t devopseasylearning/weatherapp-weather:${BUILD_NUMBER} .
+    //             '''
+    //         }
+    //     }
+    //     stage('Push weather') {
+    //         when {
+    //             branch 'HEAD'
+    //         }
+    //         steps {
+    //             sh '''
+    //                 docker push devopseasylearning/weatherapp-weather:${BUILD_NUMBER}
+    //             '''
+    //         }
+    //     }
 
-        stage('Build Redis') {
-            steps {
-                sh '''
-                    cd $WORKSPACE/weatherapp/redis
-                    docker build -t devopseasylearning/weatherapp-redis:${BUILD_NUMBER} .
-                '''
-            }
-        }
+    //     stage('Build Redis') {
+    //         steps {
+    //             sh '''
+    //                 cd $WORKSPACE/weatherapp/redis
+    //                 docker build -t devopseasylearning/weatherapp-redis:${BUILD_NUMBER} .
+    //             '''
+    //         }
+    //     }
 
-        stage('Push redis') {
-            when {
-                branch 'HEAD'
-            }
-            steps {
-                sh '''
-                    docker push devopseasylearning/weatherapp-redis:${BUILD_NUMBER}
-                '''
-            }
-        }
+    //     stage('Push redis') {
+    //         when {
+    //             branch 'HEAD'
+    //         }
+    //         steps {
+    //             sh '''
+    //                 docker push devopseasylearning/weatherapp-redis:${BUILD_NUMBER}
+    //             '''
+    //         }
+    //     }
 
-        stage('Build db') {
-            steps {
-                sh '''
-                    cd $WORKSPACE/weatherapp/db
-                    docker build -t devopseasylearning/weatherapp-db:${BUILD_NUMBER} .
-                '''
-            }
-        }
+    //     stage('Build db') {
+    //         steps {
+    //             sh '''
+    //                 cd $WORKSPACE/weatherapp/db
+    //                 docker build -t devopseasylearning/weatherapp-db:${BUILD_NUMBER} .
+    //             '''
+    //         }
+    //     }
 
-        stage('Push db') {
-            when {
-                branch 'HEAD'
-            }
-            steps {
-                sh '''
-                    docker push devopseasylearning/weatherapp-db:${BUILD_NUMBER}
-                '''
-            }
-        }
-    }
+    //     stage('Push db') {
+    //         when {
+    //             branch 'HEAD'
+    //         }
+    //         steps {
+    //             sh '''
+    //                 docker push devopseasylearning/weatherapp-db:${BUILD_NUMBER}
+    //             '''
+    //         }
+    //     }
+    // }
 }
