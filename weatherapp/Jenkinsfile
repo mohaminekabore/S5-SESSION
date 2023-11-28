@@ -107,11 +107,11 @@ pipeline {
             }
         }
         stage('Push auth') {
-            when {
-                expression {
-                    return env.BRANCH_NAME == 'develop'
-                }
-            }
+            when{ 
+          expression {
+            env.GIT_BRANCH == 'origin/develop' 
+          }
+         }
             steps {
                 sh '''
                     docker push devopseasylearning/weatherapp-auth:${BUILD_NUMBER}
@@ -128,11 +128,11 @@ pipeline {
             }
         }
         stage('Push UI') {
-            when {
-                expression {
-                    return env.BRANCH_NAME == 'develop'
-                }
-            }
+            when{ 
+          expression {
+            env.GIT_BRANCH == 'origin/develop' 
+          }
+         }
             steps {
                 sh '''
                     docker push devopseasylearning/weatherapp-ui:${BUILD_NUMBER}
@@ -149,11 +149,11 @@ pipeline {
             }
         }
         stage('Push weather') {
-           when {
-                expression {
-                    return env.BRANCH_NAME == 'develop'
-                }
-            }
+           when{ 
+          expression {
+            env.GIT_BRANCH == 'origin/develop' 
+          }
+         }
             steps {
                 sh '''
                     docker push devopseasylearning/weatherapp-weather:${BUILD_NUMBER}
@@ -171,11 +171,11 @@ pipeline {
         }
 
         stage('Push redis') {
-            when {
-                expression {
-                    return env.BRANCH_NAME == 'develop'
-                }
-            }
+            when{ 
+          expression {
+            env.GIT_BRANCH == 'origin/develop' 
+          }
+         }
             steps {
                 sh '''
                     docker push devopseasylearning/weatherapp-redis:${BUILD_NUMBER}
@@ -193,11 +193,11 @@ pipeline {
         }
 
         stage('Push db') {
-            when {
-                expression {
-                    return env.BRANCH_NAME == 'develop'
-                }
-            }
+            when{ 
+          expression {
+            env.GIT_BRANCH == 'origin/develop' 
+          }
+         }
             steps {
                 sh '''
                     docker push devopseasylearning/weatherapp-db:${BUILD_NUMBER}
