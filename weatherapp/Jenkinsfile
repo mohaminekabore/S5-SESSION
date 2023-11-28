@@ -108,7 +108,7 @@ pipeline {
         }
         stage('Push auth') {
             when {
-                branch 'HEAD'
+                branch 'develop'
             }
             steps {
                 sh '''
@@ -127,7 +127,7 @@ pipeline {
         }
         stage('Push UI') {
             when {
-                branch 'HEAD'
+                branch 'develop'
             }
             steps {
                 sh '''
@@ -146,7 +146,7 @@ pipeline {
         }
         stage('Push weather') {
             when {
-                branch 'HEAD'
+                branch 'develop'
             }
             steps {
                 sh '''
@@ -166,7 +166,7 @@ pipeline {
 
         stage('Push redis') {
             when {
-                branch 'HEAD'
+                branch 'develop'
             }
             steps {
                 sh '''
@@ -186,7 +186,7 @@ pipeline {
 
         stage('Push db') {
             when {
-                branch 'HEAD'
+                branch 'develop'
             }
             steps {
                 sh '''
