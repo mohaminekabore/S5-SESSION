@@ -108,7 +108,9 @@ pipeline {
         }
         stage('Push auth') {
             when {
-                branch 'develop'
+                expression {
+                    return env.BRANCH_NAME == 'develop'
+                }
             }
             steps {
                 sh '''
@@ -127,7 +129,9 @@ pipeline {
         }
         stage('Push UI') {
             when {
-                branch 'develop'
+                expression {
+                    return env.BRANCH_NAME == 'develop'
+                }
             }
             steps {
                 sh '''
@@ -145,8 +149,10 @@ pipeline {
             }
         }
         stage('Push weather') {
-            when {
-                branch 'develop'
+           when {
+                expression {
+                    return env.BRANCH_NAME == 'develop'
+                }
             }
             steps {
                 sh '''
@@ -166,7 +172,9 @@ pipeline {
 
         stage('Push redis') {
             when {
-                branch 'develop'
+                expression {
+                    return env.BRANCH_NAME == 'develop'
+                }
             }
             steps {
                 sh '''
@@ -186,7 +194,9 @@ pipeline {
 
         stage('Push db') {
             when {
-                branch 'develop'
+                expression {
+                    return env.BRANCH_NAME == 'develop'
+                }
             }
             steps {
                 sh '''
