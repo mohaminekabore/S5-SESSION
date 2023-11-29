@@ -229,7 +229,7 @@ pipeline {
                     ]) {
                         sh '''
                             cat <<EOF > docker-compose.yml
-                            version: '3.3'
+                            version: '3.0'
                             services:
                               db:
                                 container_name: weatherapp-db
