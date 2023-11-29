@@ -110,7 +110,7 @@ pipeline {
         }
 
         stage('Push auth') {
-            when{ 
+            when { 
                 expression {
                     env.GIT_BRANCH == 'origin/develop' 
                 }
@@ -132,7 +132,7 @@ pipeline {
         }
 
         stage('Push UI') {
-            when{ 
+            when { 
                 expression {
                     env.GIT_BRANCH == 'origin/develop' 
                 }
@@ -154,7 +154,7 @@ pipeline {
         }
 
         stage('Push weather') {
-            when{ 
+            when { 
                 expression {
                     env.GIT_BRANCH == 'origin/develop' 
                 }
@@ -176,7 +176,7 @@ pipeline {
         }
 
         stage('Push redis') {
-            when{ 
+            when { 
                 expression {
                     env.GIT_BRANCH == 'origin/develop' 
                 }
@@ -198,7 +198,7 @@ pipeline {
         }
 
         stage('Push db') {
-            when{ 
+            when { 
                 expression {
                     env.GIT_BRANCH == 'origin/develop' 
                 }
@@ -229,7 +229,7 @@ pipeline {
                     ]) {
                         sh '''
                             cat <<EOF > docker-compose.yml
-                            version: '3.1'
+                            version: '3.3'
                             services:
                               db:
                                 container_name: weatherapp-db
