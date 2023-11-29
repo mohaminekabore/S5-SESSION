@@ -306,5 +306,22 @@ pipeline {
                 }
             }
         }
+        stage('Deploy') {
+	      agent { 
+                label "s5-prod-agent"
+                 }
+         when{ 
+          expression {
+            env.GIT_BRANCH == 'origin/develop' }
+            }
+            steps {
+                sh '''
+            docker-compose down --remove-orphans || true
+            docker-compose up -d 
+            docker-compose ps 
+
+                '''
+            }
+        }
     }
 }
