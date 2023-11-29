@@ -93,11 +93,13 @@ pipeline {
                 }
             }
         }
+
         stage('Login') {
             steps {
                 sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
             }
         }
+
         stage('Build auth') {
             steps {
                 sh '''
@@ -106,12 +108,13 @@ pipeline {
                 '''
             }
         }
+
         stage('Push auth') {
             when{ 
-          expression {
-            env.GIT_BRANCH == 'origin/develop' 
-          }
-         }
+                expression {
+                    env.GIT_BRANCH == 'origin/develop' 
+                }
+            }
             steps {
                 sh '''
                     docker push devopseasylearning/weatherapp-auth:${BUILD_NUMBER}
@@ -127,12 +130,13 @@ pipeline {
                 '''
             }
         }
+
         stage('Push UI') {
             when{ 
-          expression {
-            env.GIT_BRANCH == 'origin/develop' 
-          }
-         }
+                expression {
+                    env.GIT_BRANCH == 'origin/develop' 
+                }
+            }
             steps {
                 sh '''
                     docker push devopseasylearning/weatherapp-ui:${BUILD_NUMBER}
@@ -148,12 +152,13 @@ pipeline {
                 '''
             }
         }
+
         stage('Push weather') {
-           when{ 
-          expression {
-            env.GIT_BRANCH == 'origin/develop' 
-          }
-         }
+            when{ 
+                expression {
+                    env.GIT_BRANCH == 'origin/develop' 
+                }
+            }
             steps {
                 sh '''
                     docker push devopseasylearning/weatherapp-weather:${BUILD_NUMBER}
@@ -172,10 +177,10 @@ pipeline {
 
         stage('Push redis') {
             when{ 
-          expression {
-            env.GIT_BRANCH == 'origin/develop' 
-          }
-         }
+                expression {
+                    env.GIT_BRANCH == 'origin/develop' 
+                }
+            }
             steps {
                 sh '''
                     docker push devopseasylearning/weatherapp-redis:${BUILD_NUMBER}
@@ -194,16 +199,17 @@ pipeline {
 
         stage('Push db') {
             when{ 
-          expression {
-            env.GIT_BRANCH == 'origin/develop' 
-          }
-         }
+                expression {
+                    env.GIT_BRANCH == 'origin/develop' 
+                }
+            }
             steps {
                 sh '''
                     docker push devopseasylearning/weatherapp-db:${BUILD_NUMBER}
                 '''
             }
         }
+
         stage('Generate-compose') {
             agent { 
                 label "dev"
@@ -232,11 +238,11 @@ pipeline {
                                   MYSQL_ROOT_PASSWORD: ${WEATHERAPP_MYSQL_ROOT_PASSWORD}
                                 volumes:
                                   - db-data:/var/lib/mysql
-                                networks:   
+                                networks:
                                   - weatherapp
                                 restart: always
                                 
-                               redis:
+                              redis:
                                 container_name: weatherapp-redis
                                 image: devopseasylearning/weatherapp-redis:${BUILD_NUMBER}
                                 networks:
@@ -247,7 +253,7 @@ pipeline {
                                 volumes:
                                   - redis-data:/data
                                 restart: always
-                          
+
                               weather:
                                 container_name: weatherapp-weather
                                 image: devopseasylearning/weatherapp-weather:${BUILD_NUMBER}
@@ -261,6 +267,7 @@ pipeline {
                                 depends_on:
                                   - db
                                   - redis  # Weather depends on both db and redis
+
                               auth:
                                 container_name: weatherapp-auth
                                 image: devopseasylearning/weatherapp-auth:${BUILD_NUMBER}
@@ -274,8 +281,8 @@ pipeline {
                                 restart: always
                                 depends_on:
                                   - weather  # Auth depends on the weather service
-                          
-                                  ui:
+
+                              ui:
                                 container_name: weatherapp-ui
                                 image: devopseasylearning/weatherapp-ui:${BUILD_NUMBER}
                                 environment:
@@ -294,9 +301,10 @@ pipeline {
                                 restart: always
                                 depends_on:
                                   - auth  # UI depends on Auth
+
                             networks:
                               weatherapp:
-                            
+
                             volumes:
                               db-data:
                               redis-data:
@@ -306,20 +314,21 @@ pipeline {
                 }
             }
         }
+
         stage('Deploy') {
-	      agent { 
+            agent { 
                 label "dev"
-                 }
-         when{ 
-          expression {
-            env.GIT_BRANCH == 'origin/develop' }
+            }
+            when { 
+                expression {
+                    env.GIT_BRANCH == 'origin/develop'
+                }
             }
             steps {
                 sh '''
-            docker-compose down --remove-orphans || true
-            docker-compose up -d 
-            docker-compose ps 
-
+                    docker-compose down --remove-orphans || true
+                    docker-compose up -d 
+                    docker-compose ps 
                 '''
             }
         }
